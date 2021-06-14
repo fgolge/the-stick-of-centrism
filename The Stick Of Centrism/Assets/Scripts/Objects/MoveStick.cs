@@ -4,14 +4,11 @@ using UnityEngine;
 
 public class MoveStick : MonoBehaviour
 {
-    private Vector3 startPosition = new Vector3(0f, 0.129f, 0f);
-
-    
+    private Vector3 startPosition;
 
     // Reference points of edges of the stick
     private Vector3 leftEdge;
     private Vector3 rightEdge;
-    private Vector3 initPos;
 
     [SerializeField] private float moveSpeed = 1.0f;
     [SerializeField] private float rotateSpeed = 10.0f;
@@ -21,9 +18,9 @@ public class MoveStick : MonoBehaviour
 
     private float upperBound = 1.85f;
 
-    private void Start()
+    public void Start()
     {
-        transform.position = startPosition;
+        startPosition = transform.position;
     }
 
     private void FixedUpdate()
