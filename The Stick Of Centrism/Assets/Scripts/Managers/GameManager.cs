@@ -25,6 +25,10 @@ public class GameManager : Singleton<GameManager>
         get { return _currentGameState; }
         private set { _currentGameState = value; }
     }
+    private void Start()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 
     private void Update()
     {
