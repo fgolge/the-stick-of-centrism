@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - black_hole
+  - red_hole
   layers:
   - Default
   - TransparentFX

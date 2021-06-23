@@ -6,42 +6,82 @@ public class SpawnManager : Singleton<SpawnManager>
 {
     public GameObject stickPrefab;
     public GameObject ballPrefab;
-    public GameObject holePrefab;
+    public GameObject blackHolePrefab;
+    public GameObject redHolePrefab;
 
-    List<GameObject> spawnedHoles = new List<GameObject>();
+    [SerializeField] private List<GameObject> spawnedHoles;
+
+    private GameObject spawnedStick;
+    private GameObject spawnedBall;
+
+    private MoveStick _moveStick;
 
     List<Vector3> holeSpawnPoints = new List<Vector3>();
 
     private Vector3 ballStartPos = new Vector3(0f, 0.165f, 0f);
     private Vector3 stickStartPosition = new Vector3(0f, 0.129f, 0f);
-    
+
+    private int holeNumber = 50;
 
     private void Start()
     {
         GameManager.Instance.OnGameStateChanged.AddListener(OnStateChangeHandler);
-        Spawn();
+
+        // Creating stick and ball
+        spawnedStick = Instantiate(stickPrefab);
+        spawnedBall = Instantiate(ballPrefab);
+
+        _moveStick = spawnedStick.GetComponent<MoveStick>();
+        
+        // Creating Hole Object Pooler
+        spawnedHoles = new List<GameObject>();
+
+        spawnedHoles.Add(Instantiate(redHolePrefab));
+
+        for(int i=0; i < holeNumber; i++)
+        {
+            spawnedHoles.Add(Instantiate(blackHolePrefab));
+        }
+
+        OnStart();
     }
 
     private void OnStateChangeHandler(GameManager.GameState currentState, GameManager.GameState previousState)
     {
-        if (currentState == GameManager.GameState.RUNNING && previousState == GameManager.GameState.PREGAME)
+        if (currentState == GameManager.GameState.RUNNING && (previousState == GameManager.GameState.PREGAME || previousState == GameManager.GameState.END)) 
         {
-            Spawn();
+            OnStart();
         }
         if (currentState == GameManager.GameState.END && previousState == GameManager.GameState.RUNNING)
         {
-            GameOver();
+            OnGameOver();
         }
     }
     
-    private void Spawn()
+    public void FreezeStick()
     {
-        Instantiate(stickPrefab, stickStartPosition, stickPrefab.transform.rotation);
-        Instantiate(ballPrefab, ballStartPos, ballPrefab.transform.rotation);
+        _moveStick.enabled = false;
+    }
 
-        for (int i = 0; i < 50; i++)
+    private void OnStart()
+    {
+        // Setting ball and stick active and their positions
+        spawnedStick.transform.position = stickStartPosition;
+        spawnedStick.transform.rotation = stickPrefab.transform.rotation;
+        spawnedStick.gameObject.SetActive(true);
+        _moveStick.enabled = true;
+        spawnedBall.transform.position = ballStartPos;
+        spawnedBall.transform.rotation = ballPrefab.transform.rotation;
+        spawnedBall.gameObject.SetActive(true);
+
+        // Random spawn point of red hole
+        Vector3 RandomPoint = new Vector3(Random.Range(-0.4f, 0.4f), Random.Range(1.4f, 1.7f), 0.039f);
+        holeSpawnPoints.Add(RandomPoint);
+        
+        // Generating random spawn points for holes
+        for (int i = 0; i < holeNumber; i++)
         {
-            Vector3 RandomPoint = new Vector3(Random.Range(-0.500f, 0.500f), Random.Range(0.500f, 1.800f), 0.039f);
+            RandomPoint = new Vector3(Random.Range(-0.500f, 0.500f), Random.Range(0.500f, 1.800f), 0.039f);
             bool didOverlap = false;
 
             foreach (Vector3 point in holeSpawnPoints)
@@ -61,20 +101,25 @@ public class SpawnManager : Singleton<SpawnManager>
             }
         }
 
-        //Debug.Log(holeSpawnPoints.Count);
-        /*for (int i = 0; i < holeSpawnPoints.Count; i++)
+        // Setting holes active and their positions
+        for(int i=0; i < spawnedHoles.Count; i++)
         {
-            spawnedHoles[i] = Instantiate(holePrefab, holeSpawnPoints[i], holePrefab.transform.rotation);
-        }*/
-
-        foreach(Vector3 point in holeSpawnPoints)
-        {
-            spawnedHoles.Add(Instantiate(holePrefab, point, holePrefab.transform.rotation));
+            spawnedHoles[i].transform.position = holeSpawnPoints[i];
+            spawnedHoles[i].transform.rotation = blackHolePrefab.transform.rotation;
+            spawnedHoles[i].gameObject.SetActive(true);
         }
+
+        // Clearing random point list to generate new points next game
+        holeSpawnPoints.Clear();
     }
 
-    private void GameOver()
+    private void OnGameOver()
     {
-        spawnedHoles.Clear();
+        foreach(GameObject hole in spawnedHoles)
+        {
+            hole.gameObject.SetActive(false);
+        }
+        spawnedStick.gameObject.SetActive(false);
+        spawnedBall.gameObject.SetActive(false);
     }
 }

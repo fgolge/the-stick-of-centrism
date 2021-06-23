@@ -6,7 +6,14 @@ public class UIManager : Singleton<UIManager>
 {
     [SerializeField] private PauseUI _pauseMenu;
     [SerializeField] private EndUI _endMenu;
-    
+
+    private bool winStatus;
+
+    public bool WinStatus
+    {
+        get { return winStatus; }
+        set { winStatus = value; }
+    }
 
     private void Start()
     {
@@ -26,6 +33,17 @@ public class UIManager : Singleton<UIManager>
         if (currentState == GameManager.GameState.END && previousState == GameManager.GameState.RUNNING)
         {
             _endMenu.gameObject.SetActive(true);
+
+            if (winStatus == true)
+            {
+                _endMenu.transform.GetChild(3).gameObject.SetActive(false);
+                _endMenu.transform.GetChild(2).gameObject.SetActive(true);
+            }
+            if (winStatus == false)
+            {
+                _endMenu.transform.GetChild(2).gameObject.SetActive(false);
+                _endMenu.transform.GetChild(3).gameObject.SetActive(true);
+            }
         }
         if (currentState == GameManager.GameState.RUNNING && previousState == GameManager.GameState.END)
         {
