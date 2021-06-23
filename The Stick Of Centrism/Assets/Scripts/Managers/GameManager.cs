@@ -91,6 +91,7 @@ public class GameManager : Singleton<GameManager>
 
     public void RestartGame()
     {
+        UpdateState(GameState.END);
         UpdateState(GameState.RUNNING);
     }
 

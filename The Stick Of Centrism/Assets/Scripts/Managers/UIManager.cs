@@ -48,6 +48,7 @@ public class UIManager : Singleton<UIManager>
         if (currentState == GameManager.GameState.RUNNING && previousState == GameManager.GameState.END)
         {
             _endMenu.gameObject.SetActive(false);
+            _pauseMenu.gameObject.SetActive(false);
         }
     }
 }
