@@ -27,6 +27,7 @@ public class GameManager : Singleton<GameManager>
     }
     private void Start()
     {
+        Screen.SetResolution(1920, 1080, true);
         SceneManager.LoadScene("MainMenu");
     }
 
